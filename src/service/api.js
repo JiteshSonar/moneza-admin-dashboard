@@ -1,8 +1,8 @@
 import axios from "axios";
 
 // const BASE_URL = "http://172.20.10.5:8000"; // mobile
-// const BASE_URL = "http://10.30.164.119:8000";
-const BASE_URL = "https://moneza-backend.onrender.com";
+const BASE_URL = "http://192.168.1.20:8000";
+// const BASE_URL = "https://moneza-backend.onrender.com";
 
 
 const apiCall = async (endpoint, options = {}) => {
