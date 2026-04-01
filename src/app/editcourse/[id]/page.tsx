@@ -2,9 +2,18 @@
 
 import { useState, useEffect } from "react";
 import { apiService } from "../../../service/service";
-import { Course } from "../../courses/page";
 import { useParams, useRouter } from "next/navigation";
 import toast, { Toaster } from "react-hot-toast";
+
+type EditableCourse = {
+  _id: string;
+  title: string;
+  description: string;
+  price: number;
+  status: "active" | "inactive" | "archived";
+  category: string | { _id: string; name?: string };
+  instructor: string | { _id: string; name?: string };
+};
 
 const Spinner = () => (
   <div className="flex justify-center items-center py-20">
@@ -13,8 +22,9 @@ const Spinner = () => (
 );
 
 export default function EditCourse() {
-  const [course, setCourse] = useState<Course | null>(null);
+  const [course, setCourse] = useState<EditableCourse | null>(null);
   const [loading, setLoading] = useState(false);
+  const [submitError, setSubmitError] = useState("");
   const params = useParams();
   const router = useRouter();
   const { id } = params;
@@ -41,15 +51,33 @@ export default function EditCourse() {
     e.preventDefault();
     if (!course) return;
 
+    const categoryId =
+      typeof course.category === "string" ? course.category : course.category?._id;
+    const instructorId =
+      typeof course.instructor === "string"
+        ? course.instructor
+        : course.instructor?._id;
+
+    if (!course.title.trim() || !course.description.trim()) {
+      setSubmitError("Title and description are required.");
+      return;
+    }
+
+    if (!categoryId || !instructorId) {
+      setSubmitError("Course category or instructor is missing. Please reselect them.");
+      return;
+    }
+
     setLoading(true);
+    setSubmitError("");
     try {
       const token = localStorage.getItem("token");
       const formData = new FormData();
-      formData.append("title", course.title);
-      formData.append("description", course.description);
-      formData.append("price", course.price.toString());
-      formData.append("category", course.category);
-      formData.append("instructor", course.instructor);
+      formData.append("title", course.title.trim());
+      formData.append("description", course.description.trim());
+      formData.append("price", String(course.price || 0));
+      formData.append("categoryId", categoryId);
+      formData.append("instructorId", instructorId);
       formData.append("status", course.status);
 
       await apiService.updateCourse({ courseId: id, token, formData, onUploadProgress: () => {} });
@@ -57,6 +85,7 @@ export default function EditCourse() {
       router.push("/courses");
     } catch (error) {
       console.error("Error updating course", error);
+      setSubmitError("Failed to update course. Please try again.");
       toast.error("Failed to update course");
     } finally {
       setLoading(false);
@@ -76,6 +105,11 @@ export default function EditCourse() {
       <h1 className="text-2xl font-bold mb-4">Edit Course</h1>
       <Toaster position="top-right" />
       <form onSubmit={handleSubmit} className="bg-white p-6 rounded-lg shadow-md">
+        {submitError ? (
+          <div className="mb-4 rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
+            {submitError}
+          </div>
+        ) : null}
         <div className="mb-4">
           <label className="block text-gray-700">Title</label>
           <input

@@ -28,7 +28,11 @@ export default function RootLayout({
     <html lang="en">
       <body className="flex bg-gray-50">
         {!hideLayout && <Sidebar />}
-        <div className="flex flex-col flex-1 min-h-screen ml-[200px]">
+        <div
+          className={`flex min-h-screen flex-1 flex-col ${
+            hideLayout ? "" : "ml-[200px]"
+          }`}
+        >
           {!hideLayout && <Topbar />}
           <main className="p-2 pt-20">{children}</main>
           <Toaster position="bottom-center" />

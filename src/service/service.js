@@ -22,8 +22,8 @@ export const apiService = {
       headers: { Authorization: `Bearer ${token}` },
     }),
 
-  deleteUser: ({ token }) =>
-    apiCall("/api/user/delete", {
+  deleteUser: ({ token, userId }) =>
+    apiCall(`/api/user/delete-account/${userId}`, {
       method: "DELETE",
       headers: { Authorization: `Bearer ${token}` },
     }),
@@ -41,7 +41,7 @@ export const apiService = {
       headers: { Authorization: `Bearer ${token}` },
     }),
 
-  getAllUserCountsPerCourse: (courseId, token) =>
+  getAllUserCountsPerCourse: ({ courseId, token }) =>
     apiCall(`/api/course/${courseId}/user-count`, {
       method: "GET",
       headers: { Authorization: `Bearer ${token}` },
@@ -87,13 +87,13 @@ export const apiService = {
 
   // ===================== Payment APIs =====================
   createOrder: ({ token, courseId }) =>
-    apiCall("/payment/create-order", {
+    apiCall("/api/payment/create-order", {
       method: "POST",
       headers: {
         Authorization: `Bearer ${token}`,
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({ courseId }),
+      data: { courseId },
     }),
 
   getCourseById: ({ courseId, token }) =>
@@ -111,5 +111,14 @@ export const apiService = {
         Authorization: `Bearer ${token}`,
       },
       data: formData,
+    }),
+
+  getAdminDashboardOverview: ({ token }) =>
+    apiCall("/api/admin/dashboard/overview", {
+      method: "GET",
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+      timeout: 20000,
     }),
 };
