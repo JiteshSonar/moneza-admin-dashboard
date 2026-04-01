@@ -37,6 +37,7 @@ export default function Courses() {
   );
   const [, setUser] = useState(null);
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
   const [page, setPage] = useState(1);
   const router = useRouter();
 
@@ -45,40 +46,54 @@ export default function Courses() {
 
   const getLoggedUser = async () => {
     const token = localStorage.getItem("token");
+    if (!token) {
+      router.push("/login");
+      return;
+    }
+
     try {
       setLoading(true);
+      setError("");
       const res = await apiService.getLoggedUser({ token });
       setUser(res.user);
-      if (token) {
-        getCourses(token);
-      }
+      await getCourses(token);
     } catch (error) {
       console.log("User fetch error:", error);
-      setLoading(false);
+      setError("Unable to load logged user details.");
+      router.push("/login");
     }
   };
 
   const getCourses = async (token: string) => {
     try {
-      setLoading(true);
       const res = await apiService.getCourses({ token });
       setCourses(res.courses);
-      await fetchAllUserCounts();
+      await fetchAllUserCounts(res.courses || [], token);
     } catch (error) {
       console.error("Error fetching courses", error);
+      setError("Unable to fetch courses right now.");
     } finally {
       setLoading(false);
     }
   };
 
-  const fetchAllUserCounts = async () => {
-    const token = await localStorage.getItem("token");
+  const fetchAllUserCounts = async (items: Course[], token: string) => {
     try {
-      const res = await apiService.getAllUserCountsPerCourse(token);
-      setUserCounts(res.userCounts || {});
-      console.log("res.userCounts", res.userCounts);
+      const counts = await Promise.all(
+        items.map(async (course) => {
+          const res = await apiService.getAllUserCountsPerCourse({
+            courseId: course._id,
+            token,
+          });
+
+          return [course._id, res.userCount || 0] as const;
+        })
+      );
+
+      setUserCounts(Object.fromEntries(counts));
     } catch (error) {
       console.error("Error fetching user counts", error);
+      setUserCounts({});
     }
   };
 
@@ -136,6 +151,12 @@ export default function Courses() {
         <Spinner />
       ) : (
         <>
+          {error ? (
+            <div className="rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
+              {error}
+            </div>
+          ) : null}
+
           <div className="flex justify-between items-center">
             <input
               type="text"
@@ -235,9 +256,12 @@ export default function Courses() {
           {/* Pagination */}
           <div className="flex justify-between items-center mt-4">
             <div className="text-sm text-gray-600">
-              Showing {(page - 1) * perPage + 1} -{" "}
-              {Math.min(page * perPage, filteredCourses.length)} of{" "}
-              {filteredCourses.length} courses
+              {filteredCourses.length > 0
+                ? `Showing ${(page - 1) * perPage + 1} - ${Math.min(
+                    page * perPage,
+                    filteredCourses.length
+                  )} of ${filteredCourses.length} courses`
+                : "No courses to display"}
             </div>
             <div className="flex items-center gap-2">
               <button

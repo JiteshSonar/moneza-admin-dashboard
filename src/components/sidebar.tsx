@@ -1,5 +1,12 @@
 "use client"
-import { Home, Video, Users, Settings, ArrowLeftRight  } from "lucide-react";
+import {
+  ArrowLeftRight,
+  Gift,
+  Home,
+  Settings,
+  Users,
+  Video,
+} from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { sidebarWidth } from "./constants";
@@ -8,8 +15,9 @@ const navItems = [
   { name: "Dashboard", href: "/", icon: Home },
   { name: "Courses", href: "/courses", icon: Video },
   { name: "Users", href: "/users", icon: Users },
+  { name: "Referrals", href: "/referrals", icon: Gift },
+  { name: "Payouts", href: "/transactionreward", icon: ArrowLeftRight },
   { name: "Settings", href: "/settings", icon: Settings },
-  { name: "Transactions", href: "/transactionreward", icon: ArrowLeftRight },
 ];
 
 export default function Sidebar() {

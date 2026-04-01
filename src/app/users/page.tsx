@@ -71,7 +71,12 @@ export default function Users() {
     const token = localStorage.getItem("token");
     try {
       const res = await apiService.getCourses({ token });
-      setCourses(res?.courses || []);
+      setCourses(
+        (res?.courses || []).map((course: { _id: string } & Course) => ({
+          ...course,
+          id: course._id,
+        }))
+      );
     } catch (error) {
       console.log("Error fetching courses", error);
     }
@@ -205,9 +210,12 @@ export default function Users() {
 
       <div className="flex justify-between items-center mt-4">
         <div className="text-sm text-gray-600">
-          Showing {(page - 1) * perPage + 1} -{" "}
-          {Math.min(page * perPage, sortedUsers.length)} of {sortedUsers.length}{" "}
-          users
+          {sortedUsers.length > 0
+            ? `Showing ${(page - 1) * perPage + 1} - ${Math.min(
+                page * perPage,
+                sortedUsers.length
+              )} of ${sortedUsers.length} users`
+            : "No users to display"}
         </div>
 
         <div className="flex items-center gap-2">
@@ -244,7 +252,7 @@ export default function Users() {
         </div>
 
         <div className="text-sm text-gray-600">
-          Page {page} of {totalPages}
+          Page {Math.min(page, Math.max(totalPages, 1))} of {Math.max(totalPages, 1)}
         </div>
       </div>
 
