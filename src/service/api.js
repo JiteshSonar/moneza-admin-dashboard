@@ -1,9 +1,9 @@
 import axios from "axios";
 
 // const BASE_URL = "http://172.20.10.5:8000"; // mobile
-const BASE_URL = "http://10.195.90.119:8000";
-// const BASE_URL =
-//   process.env.NEXT_PUBLIC_API_BASE_URL || "https://moneza-backend.onrender.com";
+// const BASE_URL = "http://172.20.10.5:8000";
+const BASE_URL =
+  process.env.NEXT_PUBLIC_API_BASE_URL || "https://moneza-backend.onrender.com";
 
 
 const apiCall = async (endpoint, options = {}) => {
@@ -30,7 +30,7 @@ const apiCall = async (endpoint, options = {}) => {
 
   try {
     const requestTimeout =
-      timeout ?? (data instanceof FormData ? 300000 : 10000);
+      timeout ?? (data instanceof FormData ? 1800000 : 10000);
     const response = await axios({
       url: `${BASE_URL}${endpoint}`,
       method,

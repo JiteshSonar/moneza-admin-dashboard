@@ -121,4 +121,47 @@ export const apiService = {
       },
       timeout: 20000,
     }),
+
+  getBundles: ({ token }) =>
+    apiCall("/api/bundle/bundles", {
+      method: "GET",
+      headers: { Authorization: `Bearer ${token}` },
+    }),
+
+  getBundleById: ({ bundleId, token }) =>
+    apiCall(`/api/bundle/bundle/${bundleId}`, {
+      method: "GET",
+      headers: { Authorization: `Bearer ${token}` },
+    }),
+
+  createBundle: ({ token, formData, onUploadProgress }) =>
+    apiCall("/api/bundle/create-bundle", {
+      method: "POST",
+      data: formData,
+      headers: {
+        "Content-Type": "multipart/form-data",
+        ...(token ? { Authorization: `Bearer ${token}` } : {}),
+      },
+      maxBodyLength: Infinity,
+      maxContentLength: Infinity,
+      onUploadProgress,
+    }),
+
+  updateBundle: ({ bundleId, token, formData, onUploadProgress }) =>
+    apiCall(`/api/bundle/bundle/${bundleId}`, {
+      method: "PUT",
+      data: formData,
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+      onUploadProgress,
+    }),
+
+  deleteBundle: ({ bundleId, token }) =>
+    apiCall(`/api/bundle/bundle/${bundleId}`, {
+      method: "DELETE",
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    }),
 };

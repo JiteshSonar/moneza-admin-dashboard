@@ -1,6 +1,7 @@
 "use client"
 import {
   ArrowLeftRight,
+  Layers3,
   Gift,
   Home,
   Settings,
@@ -14,6 +15,7 @@ import { sidebarWidth } from "./constants";
 const navItems = [
   { name: "Dashboard", href: "/", icon: Home },
   { name: "Courses", href: "/courses", icon: Video },
+  { name: "Bundles", href: "/bundles", icon: Layers3 },
   { name: "Users", href: "/users", icon: Users },
   { name: "Referrals", href: "/referrals", icon: Gift },
   { name: "Payouts", href: "/transactionreward", icon: ArrowLeftRight },
@@ -32,7 +34,8 @@ export default function Sidebar() {
       <nav className="flex flex-col gap-1 p-4">
         {navItems.map((item) => {
           const Icon = item.icon;
-          const isActive = pathname === item.href;
+          const isActive =
+            item.href === "/" ? pathname === "/" : pathname.startsWith(item.href);
 
           return (
             <Link
